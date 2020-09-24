@@ -22,12 +22,7 @@ const mongooseOptions = {
   useFindAndModify: false,
 };
 
-const password = process.env.DBPASSWORD,
-  dbname = process.env.DBNAME;
-
-const url = `mongodb+srv://cafe_system:${password}@wezck.ui81d.mongodb.net/${dbname}?retryWrites=true&w=majority`;
-
-mongoose.connect(url, mongooseOptions)
+mongoose.connect(process.env.urlDB, mongooseOptions)
   .then(() => console.log("Base de datos ONLINE"))
   .catch(err => console.error(err));
 

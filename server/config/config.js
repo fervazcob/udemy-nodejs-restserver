@@ -1,1 +1,14 @@
 process.env.PORT = process.env.PORT || 3000;
+
+const password = process.env.DBPASSWORD,
+    dbname = process.env.DBNAME;
+
+let url;
+
+if (JSON.parse(process.env.DEV)) {
+    url = "mongodb://localhost:27017/cafe";
+} else {
+    url = `mongodb+srv://cafe_system:${password}@wezck.ui81d.mongodb.net/${dbname}?retryWrites=true&w=majority`;
+}
+
+process.env.urlDB = url
