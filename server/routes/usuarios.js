@@ -1,14 +1,13 @@
 const express = require("express");
-const app = express();
-
 const bcrypt = require("bcrypt");
-
 const _ = require("underscore");
 
+const app = express();
+
 const Usuario = require("../models/usuarios");
+const { verificaToken, verificaRoleAdmin } = require("../middleware/autenticacion");
 
-app.get("/usuario", function (req, res) {
-
+app.get("/usuario", [verificaToken, verificaRoleAdmin], (req, res) => {
   let from = Number(req.query.from) - 1 || 0,
     limit = Number(req.query.limit) || 5;
 
@@ -22,7 +21,6 @@ app.get("/usuario", function (req, res) {
   Usuario.find({ status: true }, fieldsReturned, mongooseOpts)
     .exec()
     .then(async (usuarios) => {
-
       const count = await Usuario.countDocuments({ status: true });
 
       res.json({
@@ -39,7 +37,7 @@ app.get("/usuario", function (req, res) {
 
 });
 
-app.post("/usuario", function (req, res) {
+app.post("/usuario", [verificaToken, verificaRoleAdmin], (req, res) => {
   let { body } = req;
 
   const usuario = new Usuario({
@@ -64,7 +62,7 @@ app.post("/usuario", function (req, res) {
   });
 });
 
-app.put("/usuario/:id", function (req, res) {
+app.put("/usuario/:id", [verificaToken, verificaRoleAdmin], (req, res) => {
   let id = req.params.id;
 
   const listFilter = [
@@ -89,7 +87,7 @@ app.put("/usuario/:id", function (req, res) {
     }));
 });
 
-app.delete("/usuario/:id", function (req, res) {
+app.delete("/usuario/:id", [verificaToken, verificaRoleAdmin], (req, res) => {
 
   let id = req.params.id;
 
@@ -121,26 +119,6 @@ app.delete("/usuario/:id", function (req, res) {
       ok: false,
       err
     }));
-
-  // Usuario.findByIdAndRemove(id)
-  //   .then(usuarioBorrado => {
-
-  //     if (usuarioBorrado === null) {
-  //       return res.status(400).json({
-  //         ok: true,
-  //         err: { msg: "El documento no se encontró" }
-  //       });
-  //     }
-
-  //     return res.json({
-  //       ok: true,
-  //       usuarioBorrado,
-  //     });
-  //   })
-  //   .catch(err => res.status(400).json({
-  //     ok: false,
-  //     err,
-  //   }));
 });
 
 module.exports = app;
