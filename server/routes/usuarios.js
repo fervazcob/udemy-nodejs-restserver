@@ -1,11 +1,14 @@
 const express = require("express");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const _ = require("underscore");
 
 const app = express();
 
 const Usuario = require("../models/usuarios");
-const { verificaToken, verificaRoleAdmin } = require("../middleware/autenticacion");
+const {
+  verificaToken,
+  verificaRoleAdmin,
+} = require("../middleware/autenticacion");
 
 app.get("/usuario", [verificaToken, verificaRoleAdmin], (req, res) => {
   let from = Number(req.query.from) - 1 || 0,
@@ -14,7 +17,7 @@ app.get("/usuario", [verificaToken, verificaRoleAdmin], (req, res) => {
   const mongooseOpts = {
     limit,
     skip: from,
-  }
+  };
 
   const fieldsReturned = ["name", "email", "img", "role", "status"];
 
@@ -28,13 +31,13 @@ app.get("/usuario", [verificaToken, verificaRoleAdmin], (req, res) => {
         usuarios,
         count,
       });
-
     })
-    .catch(err => res.status(400).json({
-      ok: false,
-      err
-    }));
-
+    .catch((err) =>
+      res.status(400).json({
+        ok: false,
+        err,
+      })
+    );
 });
 
 app.post("/usuario", [verificaToken, verificaRoleAdmin], (req, res) => {
@@ -76,49 +79,51 @@ app.put("/usuario/:id", [verificaToken, verificaRoleAdmin], (req, res) => {
 
   const mongooseOptions = {
     new: true,
-    runValidators: true
-  }
+    runValidators: true,
+  };
 
   Usuario.findByIdAndUpdate(id, body, mongooseOptions)
-    .then(usuarioDB => res.json(usuarioDB))
-    .catch(err => res.status(400).json({
-      ok: false,
-      err,
-    }));
+    .then((usuarioDB) => res.json(usuarioDB))
+    .catch((err) =>
+      res.status(400).json({
+        ok: false,
+        err,
+      })
+    );
 });
 
 app.delete("/usuario/:id", [verificaToken, verificaRoleAdmin], (req, res) => {
-
   let id = req.params.id;
 
   const mongooseOpts = {
     new: true,
-    runValidators: true
-  }
+    runValidators: true,
+  };
 
   const eliminarUsuario = { status: false };
 
   Usuario.findByIdAndUpdate(id, eliminarUsuario, mongooseOpts)
-    .then(usuarioBorrado => {
-
+    .then((usuarioBorrado) => {
       if (usuarioBorrado === null) {
         return res.status(400).json({
           ok: false,
           err: {
-            msg: "El documento no se encontró"
-          }
+            msg: "El documento no se encontró",
+          },
         });
       }
 
       return res.json({
         ok: true,
-        usuarioBorrado
+        usuarioBorrado,
       });
     })
-    .catch(err => res.status(400).json({
-      ok: false,
-      err
-    }));
+    .catch((err) =>
+      res.status(400).json({
+        ok: false,
+        err,
+      })
+    );
 });
 
 module.exports = app;

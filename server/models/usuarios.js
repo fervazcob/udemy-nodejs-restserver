@@ -19,7 +19,7 @@ let usuarioSchema = new Schema({
   },
   password: {
     type: String,
-    required: [true, "La contraseña es requerida"],
+    // required: [true, "La contraseña es requerida"],
   },
   img: {
     type: String,
@@ -48,7 +48,7 @@ usuarioSchema.methods.toJSON = function () {
   delete userObject.password;
 
   return userObject;
-}
+};
 
 usuarioSchema.plugin(uniqueValidator, {
   message: "El {PATH} debe de ser único",
