@@ -1,6 +1,12 @@
+# Carpetas
 node_modules/
 uploads/
 .vscode/
 
+# Archivos
 .env
 .DS_Store
+
+# Lista de permitidos
+!/uploads/productos/.gitkeep
+!/uploads/usuarios/.gitkeep
