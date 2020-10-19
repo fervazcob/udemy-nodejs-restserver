@@ -1,47 +1,59 @@
-const jwt = require("jsonwebtoken");
-
+const jwt = require('jsonwebtoken');
 
 const verificaToken = (req, res, next) => {
+  let token = req.get('token');
 
-    let token = req.get("token");
+  jwt.verify(token, process.env.HASH, (err, decode) => {
+    if (err) {
+      return res.status(401).json({
+        ok: false,
+        err: {
+          message: 'Token no válido',
+        },
+      });
+    }
 
-    jwt.verify(token, process.env.HASH, (err, decode) => {
+    req.usuario = decode.usuario;
 
-        if (err) {
-            return res.status(401).json({
-                ok: false,
-                err: {
-                    message: "Token no válido"
-                }
-            });
-        }
+    next();
+  });
+};
 
-        req.usuario = decode.usuario;
+const verificaTokenImagen = (req, res, next) => {
+  let token = req.query.token;
 
-        next();
+  jwt.verify(token, process.env.HASH, (err, decode) => {
+    if (err) {
+      return res.status(401).json({
+        ok: false,
+        err: {
+          message: 'Token no valido',
+          err,
+        },
+      });
+    }
 
-    });
+    req.usuario = decode.usuario;
 
+    next();
+  });
 };
 
 const verificaRoleAdmin = (req, res, next) => {
+  if (req.usuario.role !== 'ADMIN_ROLE') {
+    return res.status(401).json({
+      ok: false,
+      err: {
+        message: 'No estas autorizado para ejecutar esta acción',
+      },
+    });
+  }
 
-    if (req.usuario.role !== "ADMIN_ROLE") {
-        return res.status(401).json({
-            ok: false,
-            err: {
-                message: "No estas autorizado para ejecutar esta acción"
-            }
-        });
-    }
-
-    next();
-
+  next();
 };
-
 
 module.exports = {
-    verificaToken,
-    verificaRoleAdmin,
+  verificaToken,
+  verificaTokenImagen,
+  verificaRoleAdmin,
 };
-
